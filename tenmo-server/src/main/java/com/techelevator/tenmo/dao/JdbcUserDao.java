@@ -68,7 +68,12 @@ public class JdbcUserDao implements UserDao {
         }
 
         // TODO: Create the account record with initial balance
-
+        String moneySql = "UPDATE account SET balance = 1000.00 WHERE user_id = ?;";
+        try {
+            jdbcTemplate.queryForObject(moneySql, Integer.class, newUserId);
+        } catch (DataAccessException e){
+            System.out.println("We lost your money.");
+        }
         return true;
     }
 
