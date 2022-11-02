@@ -1,13 +1,12 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Transaction;
 import com.techelevator.tenmo.model.User;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserDao {
-
-    BigDecimal getBalance();
 
     List<User> findAll();
 
@@ -16,4 +15,22 @@ public interface UserDao {
     int findIdByUsername(String username);
 
     boolean create(String username, String password);
+
+    List<Transaction> listTransactions();
+
+    List<Transaction> listPendingTransactions();
+
+    //getBalance
+    BigDecimal getBalance(long userId);
+    //demandTransaction()
+    Transaction demandTransaction(long primaryAccountId, long endAccountId, BigDecimal transferAmount);
+    //profferTransaction()
+    Transaction profferTransaction(long primaryAccountId, long endAccountId, BigDecimal transferAmount);
+    //acceptTransaction() changes the boolean endUserApproval to true
+    Boolean acceptTransaction(Transaction transaction);
+    //refuseTransaction()
+    Boolean refuseTransaction(Transaction transaction);
+    //updateBalances
+    BigDecimal updateBalances(Transaction transaction);
+
 }

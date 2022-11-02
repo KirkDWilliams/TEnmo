@@ -56,4 +56,8 @@ CONSTRAINT CK_transfer_amount CHECK(transfer_amount > 0)
 INSERT INTO tenmo_user(username,password_hash) VALUES ('ap66', 'password'),
 INSERT INTO tenmo_user(username,password_hash) VALUES ('venty20', 'password'),
 INSERT INTO tenmo_user(username,password_hash) VALUES ('hoyboi', 'password')
+
+
+
+
 COMMIT;

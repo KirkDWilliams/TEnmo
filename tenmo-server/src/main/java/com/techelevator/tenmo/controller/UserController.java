@@ -20,12 +20,13 @@ public class UserController {
 
     private UserDao dao;
 
-    public UserController() {this.dao = new ;}
+    public UserController() {
+    }
 
 
     @GetMapping(path = "/{id}")
     public BigDecimal getBalance(int id) {
-        public List
+        public List;
 
     }
 
