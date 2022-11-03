@@ -1,14 +1,19 @@
 package com.techelevator.tenmo.controller;
 
 
+import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.JdbcUserDao;
+import com.techelevator.tenmo.dao.TransactionDao;
 import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.Transaction;
+import com.techelevator.tenmo.model.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -16,33 +21,29 @@ import java.util.List;
 @RequestMapping("/user")
 @PreAuthorize("isAuthenticated()")
 
+
 public class UserController {
 
-    private UserDao dao;
+    private AccountDao dao;
+
+    private
 
     public UserController() {
     }
 
 
     @GetMapping(path = "/{id}")
-    public BigDecimal getBalance(int id) {
-        public List;
-
+    public BigDecimal getBalance(@PathVariable int id) throws AccountNotFoundException {
+        BigDecimal balance = dao.getAccountById(id).getBalance();
+        if (balance == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Balance not found");
+        }
+        return balance;
     }
 
-
-    @RequestMapping
-    public proffer() {
-
-    }
-
-    @RequestMapping
-    public demand() {
-
-    }
-
-    @RequestMapping
+    @GetMapping
     public viewMyTransactions() {
+
 
     }
 
@@ -53,3 +54,5 @@ public class UserController {
 
 
 }
+
+

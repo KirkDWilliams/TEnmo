@@ -2,13 +2,17 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
+import com.techelevator.tenmo.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.objenesis.ObjenesisException;
 import org.springframework.stereotype.Component;
 
 import java.awt.dnd.InvalidDnDOperationException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JdbcTransactionDao implements TransactionDao {
@@ -58,33 +62,34 @@ public class JdbcTransactionDao implements TransactionDao {
         return transaction;
     }
 
+    @Override
+    public List<Transaction> findAllTransactions(long id) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT transaction_id, primary_account_id, end_account_id, transfer_amount," +
+                " transfer_date, end_user_approval FROM user_transactions WHERE primary_account_id = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
-//    @Override
-//    public Transaction demandTransaction(Transaction transaction) {
-//        String sql = ""
-//
-//        return null;
-//    }
-//
-//    @Override
-//    public Transaction profferTransaction(long primaryAccountId, long endAccountId, BigDecimal transferAmount) {
-//        return null;
-//    }
-//
-//    @Override
-//    public Boolean acceptTransaction(Transaction transaction) {
-//        return null;
-//    }
-//
-//    @Override
-//    public Boolean refuseTransaction(Transaction transaction) {
-//        return null;
-//    }
-//
-//    @Override
-//    public BigDecimal updateBalances(Transaction transaction) {
-//        return null;
-//    }
+        while(results.next()) {
+            User user = mapRowToUser(results);
+            users.add(user);
+        }
+        return users;
+    }
+    // TODO: fix this and everything associated. And also complete the above findAllTransactions method
+    private Transaction mapRowToTransaction(SqlRowSet rs) {
+        Transaction transaction = new Transaction();
+        transaction.setTransactionId(rs.getLong("transaction_id"));
+        transaction.setPrimaryAccount(accountDao.getAccountById(rs.getLong("primary_account_id"))) ;
+        transaction.setEndAccount(rs.getLong("primary_account_id"));
+        transaction.setEndAccount(rs.getLong("end_account_id"));
+        transaction.setTransferAmount(rs.getBigDecimal("transfer_amount"));
+        transaction.setTransactionId(rs.getLong("transaction_id"));
+        transaction.setTransactionId(rs.getLong("transaction_id"));
+
+    }
+
+
+
 
 
 }

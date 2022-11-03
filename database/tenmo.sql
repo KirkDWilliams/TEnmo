@@ -40,23 +40,17 @@ CREATE SEQUENCE seq_transaction_id
 
 CREATE TABLE user_transactions (
 transaction_id int NOT NULL DEFAULT nextval('seq_transaction_id'),
-requesting_account_id int NOT NULL,
+primary_account_id int NOT NULL,
 end_account_id int NOT NULL,
 transfer_amount numeric(13, 2) NOT NULL,
 end_user_approval boolean DEFAULT(FALSE),
+transaction_date TIMESTAMP NOT NULL,
 CONSTRAINT PK_user_transactions PRIMARY KEY (transaction_id),
-CONSTRAINT FK_user_transactions_account_r FOREIGN KEY (requesting_account_id) REFERENCES account (account_id),
+CONSTRAINT FK_user_transactions_account_p FOREIGN KEY (primary_account_id) REFERENCES account (account_id),
 CONSTRAINT FK_user_transactions_account_e FOREIGN KEY (end_account_id) REFERENCES account (account_id),
 CONSTRAINT CK_transfer_amount CHECK(transfer_amount > 0)
 
 );
---SELECT * FROM user_transactions;
---SELECT * FROM tenmo_user;
---SELECT * FROM account;
-INSERT INTO tenmo_user(username,password_hash) VALUES ('ap66', 'password'),
-INSERT INTO tenmo_user(username,password_hash) VALUES ('venty20', 'password'),
-INSERT INTO tenmo_user(username,password_hash) VALUES ('hoyboi', 'password')
-
 
 
 
