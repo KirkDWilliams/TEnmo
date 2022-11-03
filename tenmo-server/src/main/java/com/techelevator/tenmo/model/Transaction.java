@@ -1,26 +1,41 @@
 package com.techelevator.tenmo.model;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.math.BigDecimal;
 import java.util.Date;
 
+
+
 public class Transaction {
+    @NotBlank
     private Long transactionId;
-    private Long primaryAccountId;
-    private Long endAccountId;
+    @NotBlank
+    private Account primaryAccount;
+    @NotBlank
+    private Account endAccount;
+    @NotBlank
+    @DecimalMin("0.0")
     private BigDecimal transferAmount;
+    @NotBlank
     private boolean endUserApproval;
+    @NotBlank
+    @Past
     private Date transactionDate;
 
-    public Transaction(){}
-
-    public Transaction(long transactionId, long primaryAccountId, long endAccountId, BigDecimal transferAmount, Date transactionDate){
+    public Transaction(long transactionId, Account primaryAccount, Account endAccount, BigDecimal transferAmount, Date transactionDate){
         this.transactionId = transactionId;
-        this.primaryAccountId = primaryAccountId;
-        this.endAccountId = endAccountId;
+        this.primaryAccount = primaryAccount;
+        this.endAccount = endAccount;
         this.transferAmount = transferAmount;
         this.endUserApproval = false;
         this.transactionDate = transactionDate;
     }
+
+    public Transaction(){}
+
 
     public Long getTransactionId() {
         return transactionId;
@@ -30,20 +45,20 @@ public class Transaction {
         this.transactionId = transactionId;
     }
 
-    public Long getPrimaryAccountId() {
-        return primaryAccountId;
+    public Account getPrimaryAccount() {
+        return primaryAccount;
     }
 
-    public void setPrimaryAccountId(Long primaryAccountId) {
-        this.primaryAccountId = primaryAccountId;
+    public void setPrimaryAccount(Account primaryAccount) {
+        this.primaryAccount = primaryAccount;
     }
 
-    public Long getEndAccountId() {
-        return endAccountId;
+    public Account getEndAccount() {
+        return endAccount;
     }
 
-    public void setEndAccountId(Long endAccountId) {
-        this.endAccountId = endAccountId;
+    public void setEndAccount(Account endAccount) {
+        this.endAccount = endAccount;
     }
 
     public BigDecimal getTransferAmount() {
@@ -69,4 +84,8 @@ public class Transaction {
     public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
+
+
+
+
 }

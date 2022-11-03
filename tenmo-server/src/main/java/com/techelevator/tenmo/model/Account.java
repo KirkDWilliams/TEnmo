@@ -8,7 +8,7 @@ public class Account {
 
     private Long user_id;
     private Long account_id;
-    @DecimalMin(value = "0.0", message = "The balance must be greater than 0.")
+    @DecimalMin("0.0")
     private BigDecimal balance;
 
     public Long getAccount_id() {
