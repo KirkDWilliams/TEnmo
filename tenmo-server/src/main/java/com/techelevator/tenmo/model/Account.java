@@ -3,6 +3,7 @@ package com.techelevator.tenmo.model;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class Account {
 
@@ -10,6 +11,8 @@ public class Account {
     private Long account_id;
     @DecimalMin("0.0")
     private BigDecimal balance;
+
+    public Account(){};
 
     public Long getAccount_id() {
         return account_id;
@@ -35,5 +38,16 @@ public class Account {
         this.balance = balance;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(user_id, account.user_id) && Objects.equals(account_id, account.account_id) && Objects.equals(balance, account.balance);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(user_id, account_id, balance);
+    }
 }

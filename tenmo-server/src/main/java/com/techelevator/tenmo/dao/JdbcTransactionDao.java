@@ -2,45 +2,59 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
-import com.techelevator.tenmo.model.User;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.objenesis.ObjenesisException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.constraints.Min;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.NoSuchElementException;
 
 @Component
 public class JdbcTransactionDao implements TransactionDao {
 
     private JdbcTemplate jdbcTemplate;
     private AccountDao accountDao;
+    private final BigDecimal ZERO = new BigDecimal("0.0");
+
+    public JdbcTransactionDao(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public Transaction sendMoney(Transaction transaction) {
-        // How much money is being transferred
+
         BigDecimal transferAmt = transaction.getTransferAmount();
         Account endAccount = transaction.getEndAccount();
         Account primaryAccount = transaction.getPrimaryAccount();
         Date transactionDate = transaction.getTransactionDate();
 
-        String primaryAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
-        String endAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
-
-        try {
-            jdbcTemplate.update(primaryAccntSql, (primaryAccount.getBalance().subtract(transferAmt)), primaryAccount.getAccount_id());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Insufficient funds for transfer");
+        // checks
+        // 1. can't send more money than in account
+        if(transferAmt.compareTo(primaryAccount.getBalance()) > 0){
+            throw new InvalidDnDOperationException();
         }
-        try {
-            jdbcTemplate.update(endAccntSql, (endAccount.getBalance().add(transferAmt)), endAccount.getAccount_id());
-        } catch (IllegalArgumentException e) {
-            System.err.println("ERROR Insufficient funds");
+        // 2. can't send money to self
+        if(endAccount.equals(primaryAccount)){
+            throw new InvalidDnDOperationException();
         }
+        // 3. both users are authenticated
+        // 4. can't send zero or negative transfer
+        if(transferAmt.compareTo(ZERO) < 1){
+            throw new InvalidDnDOperationException();
+        }
+        // 5.  primary account exists
+        if(!accountDao.verifyAccountById(primaryAccount.getAccount_id())){
+            throw new ObjenesisException("poop");
+        }
+        // 6. end account exists
+        if(!accountDao.verifyAccountById(endAccount.getAccount_id())){
+            throw new ObjenesisException("poop");
+        }
+        //updatePrimaryAccount
+        accountDao.updatePrimaryAccount(primaryAccount, transferAmt);
+        //updateEndAccount
+        accountDao.updateEndAccount(endAccount, transferAmt);
         return transaction;
     }
 
