@@ -15,5 +15,5 @@ BigDecimal getCurrentBalance(Account account);
 
     boolean verifyAccountById(long accountId);
 
-    Account getAccountById(long id) throws AccountNotFoundException;
+    Account getAccountById(long id);
 }

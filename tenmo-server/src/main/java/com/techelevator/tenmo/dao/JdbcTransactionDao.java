@@ -2,7 +2,6 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
-import com.techelevator.tenmo.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.objenesis.ObjenesisException;
@@ -21,7 +20,7 @@ public class JdbcTransactionDao implements TransactionDao {
     private AccountDao accountDao;
     private final BigDecimal ZERO = new BigDecimal("0.0");
 
-    public JdbcTransactionDao(JdbcTemplate jdbcTemplate){
+    public JdbcTransactionDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -35,24 +34,24 @@ public class JdbcTransactionDao implements TransactionDao {
 
         // checks
         // 1. can't send more money than in account
-        if(transferAmt.compareTo(primaryAccount.getBalance()) > 0){
+        if (transferAmt.compareTo(primaryAccount.getBalance()) > 0) {
             throw new InvalidDnDOperationException();
         }
         // 2. can't send money to self
-        if(endAccount.equals(primaryAccount)){
+        if (endAccount.equals(primaryAccount)) {
             throw new InvalidDnDOperationException();
         }
         // 3. both users are authenticated
         // 4. can't send zero or negative transfer
-        if(transferAmt.compareTo(ZERO) < 1){
+        if (transferAmt.compareTo(ZERO) < 1) {
             throw new InvalidDnDOperationException();
         }
         // 5.  primary account exists
-        if(!accountDao.verifyAccountById(primaryAccount.getAccount_id())){
+        if (!accountDao.verifyAccountById(primaryAccount.getAccount_id())) {
             throw new ObjenesisException("poop");
         }
         // 6. end account exists
-        if(!accountDao.verifyAccountById(endAccount.getAccount_id())){
+        if (!accountDao.verifyAccountById(endAccount.getAccount_id())) {
             throw new ObjenesisException("poop");
         }
         //updatePrimaryAccount
@@ -69,27 +68,38 @@ public class JdbcTransactionDao implements TransactionDao {
                 " transfer_date, end_user_approval FROM user_transactions WHERE primary_account_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
 
-        while(results.next()) {
-            User user = mapRowToUser(results);
-            users.add(user);
+        while (results.next()) {
+            Transaction transaction = mapRowToTransaction(results);
+            transactions.add(transaction);
         }
-        return users;
+        return transactions;
     }
-    // TODO: fix this and everything associated. And also complete the above findAllTransactions method
+
+    @Override
+    public Transaction findTransaction(long transactionId, String username) {
+        String sql = "SELECT transaction_id, primary_account_id, end_account_id, transfer_amount," +
+                " transfer_date, end_user_approval FROM user_transactions ut" +
+                "JOIN account a ON a.account_id=ut.primary_account_id" +
+                "JOIN user u ON u.user_id=a.user_id WHERE transaction_id = ? AND username = ?;";
+        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transactionId, username);
+
+        if (result.next()) {
+            return mapRowToTransaction(result);
+        } else {
+            return null;
+        }
+    }
+
     private Transaction mapRowToTransaction(SqlRowSet rs) {
         Transaction transaction = new Transaction();
         transaction.setTransactionId(rs.getLong("transaction_id"));
-        transaction.setPrimaryAccount(accountDao.getAccountById(rs.getLong("primary_account_id"))) ;
-        transaction.setEndAccount(rs.getLong("primary_account_id"));
-        transaction.setEndAccount(rs.getLong("end_account_id"));
+        transaction.setPrimaryAccount(accountDao.getAccountById(rs.getLong("primary_account_id")));
+        transaction.setEndAccount(accountDao.getAccountById(rs.getLong("end_account_id")));
         transaction.setTransferAmount(rs.getBigDecimal("transfer_amount"));
-        transaction.setTransactionId(rs.getLong("transaction_id"));
-        transaction.setTransactionId(rs.getLong("transaction_id"));
-
+        transaction.setEndUserApproval(rs.getBoolean("end_user_approval"));
+        transaction.setTransactionDate(rs.getDate("transfer_date"));
+        return transaction;
     }
-
-
-
 
 
 }

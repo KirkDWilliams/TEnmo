@@ -10,4 +10,8 @@ public interface TransactionDao {
 
 
     Transaction sendMoney(Transaction transaction);
+
+    List<Transaction> findAllTransactions(long id);
+
+    Transaction findTransaction(long transcationId, String username);
 }

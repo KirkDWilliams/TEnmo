@@ -32,9 +32,7 @@ public class Transaction {
     public Transaction(long transactionId, Account primaryAccount, Account endAccount, BigDecimal transferAmount, Date transactionDate){
         this.transactionId = transactionId;
         this.primaryAccount = primaryAccount;
-  //      this.primaryAccountId = primaryAccount.getAccount_id();
         this.endAccount = endAccount;
-  //      this.endAccountId = endAccount.getAccount_id();
         this.transferAmount = transferAmount;
         this.endUserApproval = false;
         this.transactionDate = transactionDate;
