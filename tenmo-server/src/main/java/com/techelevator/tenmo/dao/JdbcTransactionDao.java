@@ -65,9 +65,8 @@ public class JdbcTransactionDao implements TransactionDao {
     public List<Transaction> findAllTransactions(long id) {
         List<Transaction> transactions = new ArrayList<>();
         String sql = "SELECT transaction_id, primary_account_id, end_account_id, transfer_amount," +
-                " transfer_date, end_user_approval FROM user_transactions WHERE primary_account_id = ?;";
+                " transaction_date, end_user_approval FROM user_transactions WHERE primary_account_id = ?;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
-
         while (results.next()) {
             Transaction transaction = mapRowToTransaction(results);
             transactions.add(transaction);
@@ -77,10 +76,10 @@ public class JdbcTransactionDao implements TransactionDao {
 
     @Override
     public Transaction findTransaction(long transactionId, String username) {
-        String sql = "SELECT transaction_id, primary_account_id, end_account_id, transfer_amount," +
-                " transfer_date, end_user_approval FROM user_transactions ut" +
-                "JOIN account a ON a.account_id=ut.primary_account_id" +
-                "JOIN user u ON u.user_id=a.user_id WHERE transaction_id = ? AND username = ?;";
+        String sql = "SELECT transaction_id, primary_account_id, end_account_id, transfer_amount, transaction_date, end_user_approval " +
+                "FROM user_transactions ut " +
+                "JOIN account a ON a.account_id=ut.primary_account_id " +
+                "JOIN tenmo_user tu ON tu.user_id = a.user_id  WHERE transaction_id = ? AND username = ?;";
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transactionId, username);
 
         if (result.next()) {
@@ -97,7 +96,7 @@ public class JdbcTransactionDao implements TransactionDao {
         transaction.setEndAccount(accountDao.getAccountById(rs.getLong("end_account_id")));
         transaction.setTransferAmount(rs.getBigDecimal("transfer_amount"));
         transaction.setEndUserApproval(rs.getBoolean("end_user_approval"));
-        transaction.setTransactionDate(rs.getDate("transfer_date"));
+        transaction.setTransactionDate(rs.getDate("transaction_date"));
         return transaction;
     }
 
