@@ -35,8 +35,10 @@ public class JdbcTransactionDao implements TransactionDao {
     public Transaction sendMoney(TransactionRequestDTO transactionRequest, String username) {
 
         BigDecimal transferAmt = transactionRequest.getTransferAmount();
-        Account endAccount = accountDao.getAccountById(userDao.findIdByUsername(transactionRequest.getEndUsername()));
-        Account primaryAccount = accountDao.getAccountById(userDao.findIdByUsername(username));
+        Account endAccount = accountDao.getAccountById(userDao.findAccountIdByUserId(userDao.findIdByUsername(transactionRequest.getEndUsername())));
+        Account primaryAccount = accountDao.getAccountById(userDao.findAccountIdByUserId(userDao.findIdByUsername(username)));
+
+        //TODO create a getAccountByUsername method
 
         // checks
         // 1. can't send more money than in account
@@ -53,11 +55,11 @@ public class JdbcTransactionDao implements TransactionDao {
             throw new InvalidDnDOperationException();
         }
         // 5.  primary account exists
-        if (!accountDao.verifyAccountById(primaryAccount.getAccount_id())) {
+        if (primaryAccount == null) {
             throw new ObjenesisException("poop");
         }
         // 6. end account exists
-        if (!accountDao.verifyAccountById(endAccount.getAccount_id())) {
+        if (endAccount == null) {
             throw new ObjenesisException("poop");
         }
         //updatePrimaryAccount
@@ -66,7 +68,7 @@ public class JdbcTransactionDao implements TransactionDao {
         accountDao.updateEndAccount(endAccount, transferAmt);
 
         String sql = "INSERT INTO user_transactions (primary_account_id, end_account_id, transfer_amount, end_user_approval) VALUES (?, ?, ?, ?) RETURNING transaction_id;";
-        Long newTransactionId = jdbcTemplate.queryForObject(sql, Long.class, primaryAccount, endAccount, transferAmt, true);
+        Long newTransactionId = jdbcTemplate.queryForObject(sql, Long.class, primaryAccount.getAccount_id(), endAccount.getAccount_id(), transferAmt, true);
         return findTransaction(newTransactionId, username);
     }
 

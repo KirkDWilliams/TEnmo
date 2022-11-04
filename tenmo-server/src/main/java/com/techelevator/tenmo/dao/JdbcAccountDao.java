@@ -53,17 +53,17 @@ public class JdbcAccountDao implements AccountDao {
         return true;
     }
 
-    @Override
-    public boolean verifyAccountById(long accountId) {
-        String sql = "SELECT account_id FROM account WHERE account_id = ?;";
-        Account foundAccount = jdbcTemplate.queryForObject(sql, Account.class, accountId);
-        if (foundAccount != null) {
-            return true;
-        } else {
-            System.err.println("Account does exist!");
-            return false;
-        }
-    }
+//    @Override
+//    public boolean verifyAccountById(long accountId) {
+//        String sql = "SELECT account_id, user_id, current_balance FROM account WHERE account_id = ?;";
+//        Account foundAccount = jdbcTemplate.queryForRowSet(sql, accountId);
+//        if (foundAccount != null) {
+//            return true;
+//        } else {
+//            System.err.println("Account does exist!");
+//            return false;
+//        }
+//    }
 
     @Override
     public Account getAccountById(long id){

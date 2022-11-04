@@ -50,7 +50,9 @@ CONSTRAINT FK_user_transactions_account_p FOREIGN KEY (primary_account_id) REFER
 CONSTRAINT FK_user_transactions_account_e FOREIGN KEY (end_account_id) REFERENCES account (account_id),
 CONSTRAINT CK_transfer_amount CHECK(transfer_amount > 0)
 
+
 );
+
 
 
 

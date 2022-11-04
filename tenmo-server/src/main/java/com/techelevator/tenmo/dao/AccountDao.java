@@ -13,7 +13,7 @@ BigDecimal getCurrentBalance(Account account);
 
     boolean updateEndAccount(Account account, BigDecimal transferAmt);
 
-    boolean verifyAccountById(long accountId);
+ //   boolean verifyAccountById(long accountId);
 
     Account getAccountById(long id);
 }
