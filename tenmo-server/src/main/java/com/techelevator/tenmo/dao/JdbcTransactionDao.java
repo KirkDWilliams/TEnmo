@@ -37,8 +37,6 @@ public class JdbcTransactionDao implements TransactionDao {
         Account endAccount = accountDao.getAccountByAccountId(userDao.findAccountIdByUserId(userDao.findIdByUsername(transactionRequest.getEndUsername())));
         Account primaryAccount = accountDao.getAccountByAccountId(userDao.findAccountIdByUserId(userDao.findIdByUsername(username)));
 
-
-
         // checks
         // 1. can't send more money than in account
         if (transferAmt.compareTo(primaryAccount.getBalance()) > 0) {
@@ -131,6 +129,19 @@ public class JdbcTransactionDao implements TransactionDao {
         return transactions;
     }
 
+    @Override
+    public List<Transaction> findAllPendingTransactions(long id) {
+        List<Transaction> transactions = new ArrayList<>();
+        String sql = "SELECT transaction_id, primary_account_id, end_account_id, transfer_amount," +
+                " transaction_date, end_user_approval FROM user_transactions WHERE primary_account_id = ? AND end_user_approval = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id, false);
+        while (results.next()) {
+            Transaction transaction = mapRowToTransaction(results);
+            transactions.add(transaction);
+        }
+        return transactions;
+    }
+
 
 
 
@@ -141,7 +152,6 @@ public class JdbcTransactionDao implements TransactionDao {
                 "JOIN account a ON a.account_id=ut.primary_account_id " +
                 "JOIN tenmo_user tu ON tu.user_id = a.user_id  WHERE transaction_id = ? AND username = ?;";
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transactionId, username);
-
         if (result.next()) {
             return mapRowToTransaction(result);
         } else {

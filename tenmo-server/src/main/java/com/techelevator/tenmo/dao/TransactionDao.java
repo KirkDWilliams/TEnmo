@@ -17,5 +17,7 @@ public interface TransactionDao {
 
     List<Transaction> findAllTransactions(long id);
 
-    Transaction findTransaction(long transcationId, String username);
+    List<Transaction> findAllPendingTransactions(long id);
+
+    Transaction findTransaction(long transactionId, String username);
 }
