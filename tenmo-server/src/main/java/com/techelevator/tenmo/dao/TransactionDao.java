@@ -1,16 +1,19 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.RequestMoneyDTO;
 import com.techelevator.tenmo.model.Transaction;
-import com.techelevator.tenmo.model.TransactionRequestDTO;
+import com.techelevator.tenmo.model.SendMoneyDTO;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 public interface TransactionDao {
 
 
-    Transaction sendMoney(TransactionRequestDTO transaction, String username);
+    Transaction sendMoney(SendMoneyDTO transaction, String username);
+
+    Transaction requestMoney(RequestMoneyDTO request, String username);
+
+    void acceptOrDeny(Transaction transaction, boolean isAcceptedOrDenied);
 
     List<Transaction> findAllTransactions(long id);
 

@@ -2,9 +2,22 @@ package com.techelevator.tenmo.model;
 
 import java.math.BigDecimal;
 
-public class TransactionRequestDTO {
+public class RequestMoneyDTO {
     String endUsername;
     BigDecimal transferAmount;
+    boolean approvalStatus;
+
+    public boolean isApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(boolean approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+
+
+
 
     public String getEndUsername() {
         return endUsername;
@@ -21,4 +34,5 @@ public class TransactionRequestDTO {
     public void setTransferAmount(BigDecimal transferAmount) {
         this.transferAmount = transferAmount;
     }
+
 }

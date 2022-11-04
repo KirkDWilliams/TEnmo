@@ -2,18 +2,21 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 
 public interface AccountDao {
 
 BigDecimal getCurrentBalance(Account account);
 
-    boolean updatePrimaryAccount(Account account, BigDecimal transferAmt);
+   void sendFromPrimaryAccount(Account account, BigDecimal transferAmt);
 
-    boolean updateEndAccount(Account account, BigDecimal transferAmt);
+   void receiveIntoEndAccount(Account account, BigDecimal transferAmt);
 
  //   boolean verifyAccountById(long accountId);
 
-    Account getAccountById(long id);
+    void requestTransferIntoPrimaryAccount(Account account, BigDecimal transferAmt);
+
+    void acceptTransferOutOfEndAccount(Account account, BigDecimal transferAmt);
+
+    Account getAccountByAccountId(long id);
 }

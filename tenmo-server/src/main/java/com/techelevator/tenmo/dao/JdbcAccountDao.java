@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 
@@ -30,27 +29,48 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public boolean updatePrimaryAccount(Account account, BigDecimal transferAmt) {
+    public void sendFromPrimaryAccount(Account account, BigDecimal transferAmt) {
         String primaryAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
         try {
             jdbcTemplate.update(primaryAccntSql, (account.getBalance().subtract(transferAmt)), account.getAccount_id());
         } catch (IllegalArgumentException e) {
             System.out.println("Insufficient funds for transfer");
-            return false;
+
         }
-        return true;
+
     }
 
     @Override
-    public boolean updateEndAccount(Account account, BigDecimal transferAmt) {
+    public void receiveIntoEndAccount(Account account, BigDecimal transferAmt) {
         String endAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
         try {
             jdbcTemplate.update(endAccntSql, (account.getBalance().add(transferAmt)), account.getAccount_id());
         } catch (IllegalArgumentException e) {
             System.err.println("ERROR Insufficient funds");
-            return false;
         }
-        return true;
+    }
+
+    @Override
+    public void requestTransferIntoPrimaryAccount(Account account, BigDecimal transferAmt)  {
+        String primaryAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
+        try {
+            jdbcTemplate.update(primaryAccntSql, (account.getBalance().add(transferAmt)), account.getAccount_id());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Insufficient funds for transfer");
+        }
+
+    }
+
+    @Override
+    public void acceptTransferOutOfEndAccount(Account account, BigDecimal transferAmt) {
+        String endAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
+        try {
+            jdbcTemplate.update(endAccntSql, (account.getBalance().subtract(transferAmt)), account.getAccount_id());
+        } catch (IllegalArgumentException e) {
+            System.err.println("ERROR Insufficient funds");
+
+        }
+
     }
 
 //    @Override
@@ -66,9 +86,9 @@ public class JdbcAccountDao implements AccountDao {
 //    }
 
     @Override
-    public Account getAccountById(long id){
+    public Account getAccountByAccountId(long AccountId){
         String sql = "SELECT account_id, user_id, balance FROM account WHERE account_id = ?";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, id);
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, AccountId);
         if (rowSet.next()){
             return mapRowToAccount(rowSet);
         }
@@ -78,9 +98,9 @@ public class JdbcAccountDao implements AccountDao {
 
     private Account mapRowToAccount(SqlRowSet rs) {
         Account account = new Account();
-        account.setAccount_id(rs.getLong("user_id"));
+        account.setUser_id(rs.getLong("user_id"));
         account.setBalance(rs.getBigDecimal("balance"));
-        account.setUser_id(rs.getLong("account_id"));
+        account.setAccount_id(rs.getLong("account_id"));
         return account;
     }
 }
