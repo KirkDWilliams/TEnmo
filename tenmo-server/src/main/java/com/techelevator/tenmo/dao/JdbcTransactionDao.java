@@ -2,6 +2,7 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
+import com.techelevator.tenmo.model.TransactionRequestDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.objenesis.ObjenesisException;
@@ -9,9 +10,12 @@ import org.springframework.stereotype.Component;
 
 import java.awt.dnd.InvalidDnDOperationException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static java.time.LocalTime.now;
 
 @Component
 public class JdbcTransactionDao implements TransactionDao {
@@ -19,18 +23,20 @@ public class JdbcTransactionDao implements TransactionDao {
     private JdbcTemplate jdbcTemplate;
     private AccountDao accountDao;
     private final BigDecimal ZERO = new BigDecimal("0.0");
+    private UserDao userDao;
 
-    public JdbcTransactionDao(JdbcTemplate jdbcTemplate) {
+    public JdbcTransactionDao(JdbcTemplate jdbcTemplate, AccountDao accountDao, UserDao userDao) {
         this.jdbcTemplate = jdbcTemplate;
+        this.accountDao = accountDao;
+        this.userDao = userDao;
     }
 
     @Override
-    public Transaction sendMoney(Transaction transaction) {
+    public Transaction sendMoney(TransactionRequestDTO transactionRequest, String username) {
 
-        BigDecimal transferAmt = transaction.getTransferAmount();
-        Account endAccount = transaction.getEndAccount();
-        Account primaryAccount = transaction.getPrimaryAccount();
-        Date transactionDate = transaction.getTransactionDate();
+        BigDecimal transferAmt = transactionRequest.getTransferAmount();
+        Account endAccount = accountDao.getAccountById(userDao.findIdByUsername(transactionRequest.getEndUsername()));
+        Account primaryAccount = accountDao.getAccountById(userDao.findIdByUsername(username));
 
         // checks
         // 1. can't send more money than in account
@@ -58,7 +64,10 @@ public class JdbcTransactionDao implements TransactionDao {
         accountDao.updatePrimaryAccount(primaryAccount, transferAmt);
         //updateEndAccount
         accountDao.updateEndAccount(endAccount, transferAmt);
-        return transaction;
+
+        String sql = "INSERT INTO user_transactions (primary_account_id, end_account_id, transfer_amount, end_user_approval) VALUES (?, ?, ?, ?) RETURNING transaction_id;";
+        Long newTransactionId = jdbcTemplate.queryForObject(sql, Long.class, primaryAccount, endAccount, transferAmt, true);
+        return findTransaction(newTransactionId, username);
     }
 
     @Override

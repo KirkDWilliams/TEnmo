@@ -14,12 +14,8 @@ public class Transaction {
     private Long transactionId;
     @NotBlank
     private Account primaryAccount;
-  //  @NotBlank
-  //  private long primaryAccountId;
     @NotBlank
     private Account endAccount;
-  //  @NotBlank
-  //  private long endAccountId;
     @NotBlank
     @DecimalMin("0.0")
     private BigDecimal transferAmount;

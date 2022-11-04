@@ -4,6 +4,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.*;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transaction;
+import com.techelevator.tenmo.model.TransactionRequestDTO;
 import com.techelevator.tenmo.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.AccountNotFoundException;
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -47,7 +49,7 @@ public class UserController {
     }
 
 
-    @GetMapping(path = "/transactions/")
+    @GetMapping(path = "/transactions")
     public List<Transaction> viewMyTransactions(Principal principal) {
         List<Transaction> transactions = new ArrayList<>();
         transactions = transactionDao.findAllTransactions(userDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())));
@@ -71,8 +73,10 @@ public class UserController {
 
     }
 
-    @PostMapping
-    public Transaction sendMoney(@PathVariable)
+    @PostMapping(path = "/transactions")
+    public Transaction sendMoney(@RequestBody @Valid TransactionRequestDTO transaction, Principal principal){
+        return transactionDao.sendMoney(transaction, principal.getName());
+    }
 
 
 
