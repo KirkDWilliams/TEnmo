@@ -2,10 +2,7 @@ package com.techelevator.tenmo.controller;
 
 
 import com.techelevator.tenmo.dao.*;
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.RequestMoneyDTO;
-import com.techelevator.tenmo.model.Transaction;
-import com.techelevator.tenmo.model.SendMoneyDTO;
+import com.techelevator.tenmo.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -93,10 +90,17 @@ public class UserController {
     }
 
     @PutMapping(path = "/transactions/{id}")
-    public void acceptOrRejectTransaction(@PathVariable long transactionId, @RequestBody @Valid RequestMoneyDTO request, Principal principal) {
-        Transaction transaction = transactionDao.findTransaction(transactionId, principal.getName());
+    public void acceptOrRejectTransaction(@PathVariable int id, @RequestBody boolean isApproved, Principal principal) {
+        Transaction transaction = transactionDao.findTransaction(id, principal.getName());
         //TODO: How do we throw in the decision of accepting or rejecting into this boi.
+        transactionDao.acceptOrDeny(transaction, isApproved);
     }
+
+    @GetMapping(path = "/allUsers")
+    public List<User> listAllUsers(Principal principal) {
+        return userDao.findAll();
+    }
+
 
 
 /*  @GetMapping(path = "/transactions/{id}")
