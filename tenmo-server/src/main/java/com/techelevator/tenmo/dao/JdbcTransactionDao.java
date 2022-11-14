@@ -105,7 +105,6 @@ public class JdbcTransactionDao implements TransactionDao {
       }else if (isAcceptedOrDenied == false) {
           deleteTransaction(transaction);
       }
-
     }
 
 

@@ -92,10 +92,11 @@ public class UserController {
         }
     }
 
-    @PutMapping(path = "/transactions/{id}")
-    public void acceptOrRejectTransaction(@PathVariable long transactionId, @RequestBody @Valid RequestMoneyDTO request, Principal principal) {
+    @PutMapping(path = "/transactions/{id}/{boolean}")
+    public void acceptOrRejectTransaction(@PathVariable long transactionId,@PathVariable boolean isApproved, @RequestBody @Valid RequestMoneyDTO request, Principal principal) {
         Transaction transaction = transactionDao.findTransaction(transactionId, principal.getName());
         //TODO: How do we throw in the decision of accepting or rejecting into this boi.
+        transactionDao.acceptOrDeny(transaction,isApproved);
     }
 
 
