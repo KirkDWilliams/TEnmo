@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 
-
 public class Transaction {
     @NotBlank
     private Long transactionId;
@@ -25,7 +24,7 @@ public class Transaction {
     @Past
     private Date transactionDate;
 
-    public Transaction(long transactionId, Account primaryAccount, Account endAccount, BigDecimal transferAmount, Date transactionDate){
+    public Transaction(long transactionId, Account primaryAccount, Account endAccount, BigDecimal transferAmount, Date transactionDate) {
         this.transactionId = transactionId;
         this.primaryAccount = primaryAccount;
         this.endAccount = endAccount;
@@ -34,8 +33,8 @@ public class Transaction {
         this.transactionDate = transactionDate;
     }
 
-    public Transaction(){}
-
+    public Transaction() {
+    }
 
     public Long getTransactionId() {
         return transactionId;
@@ -84,8 +83,6 @@ public class Transaction {
     public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
-
-
 
 
 }

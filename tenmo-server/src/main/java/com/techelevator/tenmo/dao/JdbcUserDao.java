@@ -16,7 +16,6 @@ public class JdbcUserDao implements UserDao {
 
     private JdbcTemplate jdbcTemplate;
 
-
     public JdbcUserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -33,10 +32,10 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public long findAccountIdByUserId(long userId){
+    public long findAccountIdByUserId(long userId) {
         String sql = "SELECT account_id FROM account WHERE user_id = ?";
         Long accountId = jdbcTemplate.queryForObject(sql, Long.class, userId);
-        if(accountId != null){
+        if (accountId != null) {
             return accountId;
         } else {
             return -1;
@@ -48,7 +47,7 @@ public class JdbcUserDao implements UserDao {
         List<User> users = new ArrayList<>();
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user;";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        while(results.next()) {
+        while (results.next()) {
             User user = mapRowToUser(results);
             users.add(user);
         }
@@ -59,16 +58,18 @@ public class JdbcUserDao implements UserDao {
     public User findByUsername(String username) throws UsernameNotFoundException {
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE username ILIKE ?;";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, username);
-        if (rowSet.next()){
+        if (rowSet.next()) {
             return mapRowToUser(rowSet);
         }
         throw new UsernameNotFoundException("User " + username + " was not found.");
     }
 
+
     @Override
     public boolean create(String username, String password) {
 
-        // create user
+        // creates user
+
         String sql = "INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETURNING user_id";
         String password_hash = new BCryptPasswordEncoder().encode(password);
         Integer newUserId;
@@ -77,11 +78,12 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
+        // sets user account balance to $1,000.00
 
         String moneySql = "INSERT INTO account(user_id, balance) VALUES (?, 1000)";
         try {
             jdbcTemplate.update(moneySql, newUserId);
-        } catch (DataAccessException e){
+        } catch (DataAccessException e) {
             System.out.println("We lost your money.");
         }
         return true;

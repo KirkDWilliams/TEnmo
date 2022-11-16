@@ -30,6 +30,7 @@ public class JdbcTransactionDao implements TransactionDao {
         this.userDao = userDao;
     }
 
+    // sends money to a registered account.
     @Override
     public Transaction sendMoney(SendMoneyDTO transactionRequest, String username) {
 
@@ -37,25 +38,25 @@ public class JdbcTransactionDao implements TransactionDao {
         Account endAccount = accountDao.getAccountByAccountId(userDao.findAccountIdByUserId(userDao.findIdByUsername(transactionRequest.getEndUsername())));
         Account primaryAccount = accountDao.getAccountByAccountId(userDao.findAccountIdByUserId(userDao.findIdByUsername(username)));
 
-        // checks
-        // 1. can't send more money than in account
+
+        // can't send more money than in account
         if (transferAmt.compareTo(primaryAccount.getBalance()) > 0) {
             throw new InvalidDnDOperationException();
         }
-        // 2. can't send money to self
+        // can't send money to self
         if (endAccount.equals(primaryAccount)) {
             throw new InvalidDnDOperationException();
         }
-        // 3. both users are authenticated
-        // 4. can't send zero or negative transfer
+        // both users are authenticated
+        // can't send zero or negative transfer
         if (transferAmt.compareTo(ZERO) < 1) {
             throw new InvalidDnDOperationException();
         }
-        // 5.  primary account exists
+        // primary account exists
         if (primaryAccount == null) {
             throw new ObjenesisException("poop");
         }
-        // 6. end account exists
+        //  end account exists
         if (endAccount == null) {
             throw new ObjenesisException("poop");
         }
@@ -69,6 +70,7 @@ public class JdbcTransactionDao implements TransactionDao {
         return findTransaction(newTransactionId, username);
     }
 
+    //beginning of requesting money from another registered user
     @Override
     public Transaction requestMoney(RequestMoneyDTO request, String username) {
 
@@ -95,19 +97,18 @@ public class JdbcTransactionDao implements TransactionDao {
         Long newTransactionId = jdbcTemplate.queryForObject(sql, Long.class, primaryAccount.getAccount_id(), endAccount.getAccount_id(), transferAmt, false);
         return findTransaction(newTransactionId, username);
     }
+    //TODO: find way to get user approval from site
 
     @Override
-    public void acceptOrDeny(Transaction transaction, boolean isAcceptedOrDenied) {
-      if (isAcceptedOrDenied == true) {
-          accountDao.acceptTransferOutOfEndAccount(transaction.getPrimaryAccount(), transaction.getTransferAmount());
-          accountDao.requestTransferIntoPrimaryAccount(transaction.getEndAccount(), transaction.getTransferAmount());
+    public void acceptOrDeny(Transaction transaction, boolean isApprovedOrRejected) {
+        if (isApprovedOrRejected) {
+            accountDao.acceptTransferOutOfEndAccount(transaction.getPrimaryAccount(), transaction.getTransferAmount());
+            accountDao.requestTransferIntoPrimaryAccount(transaction.getEndAccount(), transaction.getTransferAmount());
 
-      }else if (isAcceptedOrDenied == false) {
-          deleteTransaction(transaction);
-      }
+        } else if (!isApprovedOrRejected) {
+            deleteTransaction(transaction);
+        }
     }
-
-
 
     public void deleteTransaction(Transaction transaction) {
         String sql = "DELETE FROM user_transactions WHERE transaction_id = ?;";
@@ -140,8 +141,6 @@ public class JdbcTransactionDao implements TransactionDao {
         }
         return transactions;
     }
-
-
 
 
     @Override

@@ -17,6 +17,7 @@ public class JdbcAccountDao implements AccountDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // gets the current user's balance.
     @Override
     public BigDecimal getCurrentBalance(Account account) throws NoSuchElementException {
         String sql = "SELECT balance FROM account WHERE user_id = ?;";
@@ -35,9 +36,7 @@ public class JdbcAccountDao implements AccountDao {
             jdbcTemplate.update(primaryAccntSql, (account.getBalance().subtract(transferAmt)), account.getAccount_id());
         } catch (IllegalArgumentException e) {
             System.out.println("Insufficient funds for transfer");
-
         }
-
     }
 
     @Override
@@ -51,7 +50,7 @@ public class JdbcAccountDao implements AccountDao {
     }
 
     @Override
-    public void requestTransferIntoPrimaryAccount(Account account, BigDecimal transferAmt)  {
+    public void requestTransferIntoPrimaryAccount(Account account, BigDecimal transferAmt) {
         String primaryAccntSql = "UPDATE account SET balance = ? WHERE account_id = ?";
         try {
             jdbcTemplate.update(primaryAccntSql, (account.getBalance().add(transferAmt)), account.getAccount_id());
@@ -68,33 +67,18 @@ public class JdbcAccountDao implements AccountDao {
             jdbcTemplate.update(endAccntSql, (account.getBalance().subtract(transferAmt)), account.getAccount_id());
         } catch (IllegalArgumentException e) {
             System.err.println("ERROR Insufficient funds");
-
         }
-
     }
 
-//    @Override
-//    public boolean verifyAccountById(long accountId) {
-//        String sql = "SELECT account_id, user_id, current_balance FROM account WHERE account_id = ?;";
-//        Account foundAccount = jdbcTemplate.queryForRowSet(sql, accountId);
-//        if (foundAccount != null) {
-//            return true;
-//        } else {
-//            System.err.println("Account does exist!");
-//            return false;
-//        }
-//    }
-
     @Override
-    public Account getAccountByAccountId(long AccountId){
+    public Account getAccountByAccountId(long AccountId) {
         String sql = "SELECT account_id, user_id, balance FROM account WHERE account_id = ?";
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, AccountId);
-        if (rowSet.next()){
+        if (rowSet.next()) {
             return mapRowToAccount(rowSet);
         }
         return null;
     }
-
 
     private Account mapRowToAccount(SqlRowSet rs) {
         Account account = new Account();

@@ -34,12 +34,12 @@ public class UserController {
         this.userDao = userDao;
     }
 
-    
+
     @GetMapping(path = "")
-    public BigDecimal getBalance(Principal principal)  {
+    public BigDecimal getBalance(Principal principal) {
         Account account = accountDao.getAccountByAccountId(userDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())));
         if (account != null) {
-         //   System.out.println("Your balance is:");
+            //   System.out.println("Your balance is:");
             return account.getBalance();
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Balance not found.");
@@ -51,8 +51,7 @@ public class UserController {
     public List<Transaction> viewMyTransactions(Principal principal) {
         List<Transaction> transactions = new ArrayList<>();
         transactions = transactionDao.findAllTransactions(userDao.findAccountIdByUserId(userDao.findIdByUsername(principal.getName())));
-       if (transactions.size() == 0) {
-       // if (transactions == null) {
+        if (transactions.size() == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No transactions for this user.");
         } else {
             return transactions;
@@ -60,24 +59,22 @@ public class UserController {
     }
 
     @GetMapping(path = "/transactions/{id}")
-    public Transaction viewMyTransactionById(@PathVariable int id, Principal principal)  {
+    public Transaction viewMyTransactionById(@PathVariable int id, Principal principal) {
         Transaction transaction = transactionDao.findTransaction(id, principal.getName());
         if (transaction != null) {
             return transaction;
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No transaction with given identification.");
         }
-
-
     }
 
     @PostMapping(path = "/transactions")
-    public Transaction sendMoney(@RequestBody @Valid SendMoneyDTO transaction, Principal principal){
+    public Transaction sendMoney(@RequestBody @Valid SendMoneyDTO transaction, Principal principal) {
         return transactionDao.sendMoney(transaction, principal.getName());
     }
 
     @PostMapping(path = "/requests")
-    public Transaction requestMoney(@RequestBody @Valid RequestMoneyDTO transaction, Principal principal){
+    public Transaction requestMoney(@RequestBody @Valid RequestMoneyDTO transaction, Principal principal) {
         return transactionDao.requestMoney(transaction, principal.getName());
     }
 
@@ -92,26 +89,12 @@ public class UserController {
         }
     }
 
-    @PutMapping(path = "/transactions/{id}/{boolean}")
-    public void acceptOrRejectTransaction(@PathVariable long transactionId,@PathVariable boolean isApproved, @RequestBody @Valid RequestMoneyDTO request, Principal principal) {
+    @PutMapping(path = "/transactions/{id}")
+    public void acceptOrRejectTransaction(@PathVariable long transactionId, @PathVariable boolean isApproved, @RequestBody @Valid RequestMoneyDTO request, Principal principal) {
         Transaction transaction = transactionDao.findTransaction(transactionId, principal.getName());
         //TODO: How do we throw in the decision of accepting or rejecting into this boi.
-        transactionDao.acceptOrDeny(transaction,isApproved);
+        transactionDao.acceptOrDeny(transaction, isApproved);
     }
-
-
-/*  @GetMapping(path = "/transactions/{id}")
-    public Transaction viewMyTransactionById(@PathVariable int id, Principal principal)  {
-        Transaction transaction = transactionDao.findTransaction(id, principal.getName());
-        if (transaction != null) {
-            return transaction;
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No transaction with given identification.");
-        }
-
-
-    }*/
-
 
 
 }

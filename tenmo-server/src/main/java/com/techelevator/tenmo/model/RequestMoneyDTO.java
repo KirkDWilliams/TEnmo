@@ -15,10 +15,6 @@ public class RequestMoneyDTO {
         this.approvalStatus = approvalStatus;
     }
 
-
-
-
-
     public String getEndUsername() {
         return endUsername;
     }

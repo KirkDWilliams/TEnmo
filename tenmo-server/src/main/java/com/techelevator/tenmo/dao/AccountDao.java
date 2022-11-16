@@ -6,13 +6,13 @@ import java.math.BigDecimal;
 
 public interface AccountDao {
 
-BigDecimal getCurrentBalance(Account account);
+    BigDecimal getCurrentBalance(Account account);
 
-   void sendFromPrimaryAccount(Account account, BigDecimal transferAmt);
+    void sendFromPrimaryAccount(Account account, BigDecimal transferAmt);
 
-   void receiveIntoEndAccount(Account account, BigDecimal transferAmt);
+    void receiveIntoEndAccount(Account account, BigDecimal transferAmt);
 
- //   boolean verifyAccountById(long accountId);
+    //   boolean verifyAccountById(long accountId);
 
     void requestTransferIntoPrimaryAccount(Account account, BigDecimal transferAmt);
 

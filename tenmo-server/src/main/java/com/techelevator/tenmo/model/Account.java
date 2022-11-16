@@ -12,7 +12,10 @@ public class Account {
     @DecimalMin("0.0")
     private BigDecimal balance;
 
-    public Account(){};
+    public Account() {
+    }
+
+    ;
 
     public Long getAccount_id() {
         return account_id;

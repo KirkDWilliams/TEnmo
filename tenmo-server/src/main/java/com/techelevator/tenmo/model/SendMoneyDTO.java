@@ -6,8 +6,6 @@ public class SendMoneyDTO {
     String endUsername;
     BigDecimal transferAmount;
 
-
-
     public String getEndUsername() {
         return endUsername;
     }
